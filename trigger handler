@@ -1,0 +1,120 @@
+// TRIGGER HANDLER - Medi Desk Patient Assistant (Contest-Ready)
+response = Map();
+// Get visitor information
+visitorName = visitor.get("name");
+visitorEmail = visitor.get("email");
+visitorPhone = visitor.get("phone");
+currentPage = visitor.get("page");
+// Get current time for personalized greeting
+currentHour = now.getHour();
+currentDay = now.getDay();
+// Determine time-based greeting
+greeting = "";
+timeEmoji = "";
+if(currentHour >= 5 && currentHour < 12)
+{
+	greeting = "Good Morning";
+	timeEmoji = "☀️";
+}
+else if(currentHour >= 12 && currentHour < 17)
+{
+	greeting = "Good Afternoon";
+	timeEmoji = "🌤️";
+}
+else if(currentHour >= 17 && currentHour < 21)
+{
+	greeting = "Good Evening";
+	timeEmoji = "🌆";
+}
+else
+{
+	greeting = "Hello";
+	timeEmoji = "🌙";
+}
+// Check if it's weekend
+isWeekend = false;
+if(currentDay == 1 || currentDay == 7)
+{
+	isWeekend = true;
+}
+// ========== EMERGENCY PAGE SPECIFIC TRIGGER ==========
+if(currentPage != null && (currentPage.contains("/emergency") || currentPage.contains("/urgent")))
+{
+	response.put("action","reply");
+	response.put("replies",{"🚨 EMERGENCY MEDICAL ASSISTANCE 🚨\n\nAre you facing a medical emergency?\n\n⚠️ FOR IMMEDIATE HELP:\n📞 National Emergency: 112\n🏥 Hospital Emergency: +91-98765-43210\n🚑 Ambulance: +91-98765-43211\n\n📍 Emergency Department:\nMedi Desk Hospital, 2nd Floor\nCity Center, Your City - 400001\n\n⏰ 24/7 Emergency Services Available\n\n⚡ LIFE-THREATENING CONDITIONS:\n• Severe chest pain / Heart attack\n• Difficulty breathing\n• Heavy bleeding\n• Loss of consciousness\n• Stroke symptoms\n• Severe injury\n\n👉 If critical, CALL 112 NOW!\n\nFor non-critical urgent care, I can help you:"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"🚑 Call Emergency Now","📍 Get Directions to Hospital","⚡ Book Urgent Appointment","👨‍⚕️ Talk to Emergency Doctor","💊 Find Nearest Pharmacy"});
+	response.put("input",inputMap);
+}
+// ========== HEALTH PACKAGES PAGE SPECIFIC TRIGGER ==========
+else if(currentPage != null && (currentPage.contains("/packages") || currentPage.contains("/checkup") || currentPage.contains("/health")))
+{
+	response.put("action","reply");
+	response.put("replies",{greeting + "! " + timeEmoji + " Welcome to Medi Desk Health Packages!\n\n🎊 LIMITED TIME OFFER - Save up to 40%!\n\n💚 Basic Checkup - ₹999 (was ₹1,299)\n💙 Complete Checkup - ₹2,499 (was ₹2,999)\n💜 Executive Checkup - ₹4,999 (was ₹5,999)\n\n✨ SPECIAL BENEFITS:\n✓ FREE home sample collection\n✓ Reports in 24-48 hours\n✓ NABL certified lab\n✓ Expert doctor consultation\n✓ No hidden charges\n\n🎁 Book today and get a FREE diabetes screening!\n\n⏰ Offer valid till Dec 31, 2025\n\nReady to invest in your health?"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"💚 Book Basic Package (₹999)","💙 Book Complete Package (₹2,499)","💜 Book Executive Package (₹4,999)","📊 Compare All Packages","❓ Talk to Health Advisor"});
+	response.put("input",inputMap);
+}
+// ========== LAB TESTS PAGE SPECIFIC TRIGGER ==========
+else if(currentPage != null && (currentPage.contains("/lab") || currentPage.contains("/test") || currentPage.contains("/diagnostic")))
+{
+	response.put("action","reply");
+	response.put("replies",{greeting + "! " + timeEmoji + " Welcome to Medi Desk Lab Services!\n\n🧪 ACCREDITED DIAGNOSTIC CENTER\n\n✅ What We Offer:\n• Complete Blood Count (CBC)\n• Thyroid Profile (T3, T4, TSH)\n• Lipid Profile (Cholesterol)\n• Diabetes Tests (HbA1c, Fasting)\n• COVID-19 RT-PCR\n• X-Ray & Ultrasound\n• ECG & ECHO\n• 500+ other tests\n\n🏆 Why Choose Us?\n✓ NABL certified lab\n✓ Home sample collection\n✓ Reports in 24-48 hours\n✓ Online report access\n✓ Competitive pricing\n\n📱 Digital reports via email & SMS\n\nWhat would you like to do?"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"🧪 Book Lab Test","🏠 Home Sample Collection","📄 View My Reports","💰 Check Test Prices","📞 Talk to Lab Technician"});
+	response.put("input",inputMap);
+}
+// ========== DOCTORS/SPECIALISTS PAGE TRIGGER ==========
+else if(currentPage != null && (currentPage.contains("/doctor") || currentPage.contains("/specialist") || currentPage.contains("/appointment")))
+{
+	response.put("action","reply");
+	response.put("replies",{greeting + "! " + timeEmoji + " Welcome to Medi Desk!\n\n👨‍⚕️ EXPERT MEDICAL TEAM\n\n50+ Specialist Doctors | 10+ Specialties\n\n🫀 Cardiology - Heart Specialists\n🦴 Orthopedics - Bone & Joint Experts\n👶 Pediatrics - Child Care Specialists\n🧴 Dermatology - Skin & Hair Doctors\n💊 General Medicine - Family Physicians\n🧠 Neurology - Brain & Nerve Experts\n👁️ Ophthalmology - Eye Specialists\n🦷 Dentistry - Dental Surgeons\n\n✨ All doctors:\n✓ Board certified\n✓ 10+ years experience\n✓ Patient-first approach\n\n📅 Same-day appointments available!\n\nHow can I help you?"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"📅 Book Appointment Now","👨‍⚕️ View All Doctors","🏥 Browse Specialties","⏰ Check Availability","💬 Talk to Receptionist"});
+	response.put("input",inputMap);
+}
+// ========== RETURNING VISITOR (Has name and email) ==========
+else if(visitorName != null && visitorName != "" && visitorEmail != null && visitorEmail != "")
+{
+	response.put("action","reply");
+	response.put("replies",{greeting + ", " + visitorName + "! " + timeEmoji + "\n\nWelcome back to Medi Desk! 👋\n\nGreat to see you again. I hope you're doing well!\n\n📋 YOUR QUICK ACCESS:\n✓ View your appointments\n✓ Check lab reports\n✓ Download prescriptions\n✓ Book follow-up\n\n💙 We're here to take care of your health needs.\n\nWhat brings you here today?"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"📅 Book New Appointment","📄 View My Reports","💊 My Prescriptions","🧪 Book Lab Test","🏥 My Medical History","💬 Talk to Support"});
+	response.put("input",inputMap);
+}
+// ========== NEW VISITOR - WEEKEND GREETING ==========
+else if(isWeekend)
+{
+	response.put("action","reply");
+	response.put("replies",{greeting + "! " + timeEmoji + " Welcome to Medi Desk!\n\n🏥 Your 24/7 Healthcare Partner\n\n📢 Weekend Special:\nOur OPD is open on Sundays too!\nTimings: 10:00 AM - 6:00 PM\n\n✨ I'm your AI Health Assistant, here to help you with:\n\n📅 Book doctor appointments instantly\n🧪 Schedule lab tests at home\n💚 Explore health checkup packages\n📄 Access medical reports\n🚨 Get emergency assistance (24/7)\n💳 Bill payments & insurance queries\n\n🔒 Your data is 100% secure & confidential\n🌟 Trusted by 1 lakh+ patients\n\n💙 How can I assist you today?"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"📅 Book Appointment","🧪 Lab Test Booking","💚 Health Packages","🚨 Emergency Help","💬 Chat with Doctor","ℹ️ Learn More"});
+	response.put("input",inputMap);
+}
+// ========== NEW VISITOR - LATE NIGHT GREETING ==========
+else if(currentHour >= 21 || currentHour < 5)
+{
+	response.put("action","reply");
+	response.put("replies",{greeting + "! " + timeEmoji + " Welcome to Medi Desk!\n\n🌙 24/7 Healthcare Support Available\n\nEven though it's late, I'm here to help!\n\n🏥 What I can do for you right now:\n\n📅 Book appointments for tomorrow\n🧪 Schedule lab tests\n📄 Access your medical reports\n🚨 Get emergency contact info\n💬 Leave a message for our team\n\n⚡ For medical emergencies:\nCall 112 or our emergency line:\n+91-98765-43210\n\n💙 How can I assist you tonight?"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"📅 Book Appointment","🚨 Emergency Contact","🧪 Schedule Lab Test","📄 View Reports","💬 Leave Message","ℹ️ Hospital Info"});
+	response.put("input",inputMap);
+}
+// ========== NEW VISITOR - GENERAL WELCOME (DEFAULT) ==========
+else
+{
+	response.put("action","reply");
+	response.put("replies",{greeting + "! " + timeEmoji + " Welcome to Medi Desk!\n\n🏥 Your Trusted Healthcare Partner Since 2010\n\n✨ I'm your AI Health Assistant, here to make healthcare simple and accessible!\n\n💙 What I Can Help You With:\n\n📅 Book Doctor Appointments\n   • 50+ specialist doctors\n   • Same-day slots available\n   • Video consultations too!\n\n🧪 Lab Test Bookings\n   • 500+ tests available\n   • FREE home sample collection\n   • Reports in 24-48 hours\n\n💚 Health Checkup Packages\n   • Starting from just ₹999\n   • Comprehensive screening\n   • Expert consultation included\n\n📄 View Medical Reports\n   • Secure online access\n   • Download anytime\n\n🚨 24/7 Emergency Support\n   • Immediate assistance\n   • Ambulance service\n\n💳 Billing & Insurance\n   • Multiple payment options\n   • 50+ insurance providers\n\n🔒 Your Privacy Matters:\nAll your health data is encrypted and confidential.\n\n🌟 Trusted by 1,00,000+ patients\n⭐ 4.8/5 patient satisfaction rating\n\n💙 How can I help you today?"});
+	inputMap = Map();
+	inputMap.put("type","select");
+	inputMap.put("options",{"📅 Book Appointment","🧪 Lab Test Booking","💚 Health Packages","🚨 Emergency","👨‍⚕️ Our Doctors","ℹ️ About Us"});
+	response.put("input",inputMap);
+}
+return response;
