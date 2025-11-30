@@ -1,0 +1,39 @@
+// SALESIQ WIDGET SCRIPT - DETAIL HANDLER
+// For Medi Desk Patient Dashboard
+response = Map();
+response.put("type","widget_detail");
+// =================================================
+// 1. METRIC SECTION: Patient Overview
+// =================================================
+// Displays key patient stats at the top
+metrix = {{"label":"Patient ID","value":"MDK12345"},{"label":"Total Visits","value":"12"},{"label":"Last Visit","value":"Nov 20, 2025"}};
+metricSection = {"name":"patientOverview","layout":"metric","title":"Patient Overview","data":metrix,"actions":{{"label":"Book Appointment","name":"bookAppt"},{"label":"Update Profile","name":"updateProfile"}},"reference_id":"MDK12345"};
+// =================================================
+// 2. FIELDSET SECTION: Personal Details
+// =================================================
+// Shows patient demographics and contact info
+fieldSet = {{"label":"Full Name","value":"Rahul Kumar"},{"label":"Age / Gender","value":"32 / Male"},{"label":"Blood Group","value":"O+"},{"label":"Phone","value":"+91-98765-43210"},{"label":"Email","value":"rahul.kumar@example.com"},{"label":"Address","value":"123, MG Road, City Center"}};
+fieldsetSection = {"name":"patientDetails","layout":"fieldset","title":"Personal Information","data":fieldSet,"link_hint":"View full CRM profile","link":"https://crm.zoho.com/crm/org123456/tab/Leads/recordId"};
+// =================================================
+// 3. LISTING SECTION: Upcoming Appointments
+// =================================================
+// Lists confirmed future appointments
+appointments = {{"name":"APPT-101","title":"Dr. Rajesh Kumar (Cardiology)","text":"Dec 05, 2025 | 10:00 AM","subtext":"Consultation | Confirmed","link":"#","link_hint":"View Details"},{"name":"APPT-102","title":"Lab Test: Complete Blood Count","text":"Dec 06, 2025 | 08:00 AM","subtext":"Home Sample Collection | Pending","link":"#","link_hint":"View Details"}};
+appointmentSection = {"name":"upcomingAppointments","layout":"listing","title":"Upcoming Appointments","data":appointments,"actions":{{"label":"Reschedule","name":"rescheduleAppt"},{"label":"Cancel","name":"cancelAppt"}}};
+// =================================================
+// 4. LISTING SECTION: Medical Reports
+// =================================================
+// Lists past lab reports for quick access
+reports = {{"name":"RPT-2025-001","title":"Lipid Profile Report","text":"Nov 20, 2025 | Dr. Rajesh Kumar","subtext":"Result: Normal","link":"https://medidesk.com/reports/lipid-profile.pdf","link_hint":"Download PDF"},{"name":"RPT-2025-002","title":"COVID-19 RT-PCR","text":"Oct 15, 2025 | Lab Dept","subtext":"Result: Negative","link":"https://medidesk.com/reports/covid.pdf","link_hint":"Download PDF"}};
+reportSection = {"name":"medicalReports","layout":"listing","title":"Recent Medical Reports","data":reports,"search":true,"navigate":true};
+// =================================================
+// 5. EMPTY SECTION: Prescriptions
+// =================================================
+// Shows if no active prescriptions exist
+emptySection = {"name":"activePrescriptions","title":"Active Prescriptions","layout":"empty","text":"No active prescriptions found","actions":{{"name":"addPrescription","label":"Add New Prescription"}}};
+// =================================================
+// COMBINE ALL SECTIONS
+// =================================================
+sections = {metricSection,fieldsetSection,appointmentSection,reportSection,emptySection};
+response.put("sections",sections);
+return response;
