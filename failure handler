@@ -1,0 +1,135 @@
+// FAILURE HANDLER - Medi Desk Patient Assistant (Fixed)
+response = Map();
+// Log failure details for debugging and monitoring
+info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+info "FAILURE HANDLER TRIGGERED";
+info "Timestamp: " + zoho.currenttime;
+info "Failed Response: " + failed_response.toString();
+info "Cause: " + cause.toString();
+info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+// Get visitor information for admin notification
+visitorName = visitor.get("name");
+visitorEmail = visitor.get("email");
+visitorPhone = visitor.get("phone");
+// Prepare detailed failure report for admin
+failureReport = "MEDI DESK BOT FAILURE ALERT\n\n";
+failureReport = failureReport + "Timestamp: " + zoho.currenttime + "\n\n";
+failureReport = failureReport + "VISITOR DETAILS:\n";
+failureReport = failureReport + "Name: " + visitorName + "\n";
+failureReport = failureReport + "Email: " + visitorEmail + "\n";
+failureReport = failureReport + "Phone: " + visitorPhone + "\n\n";
+failureReport = failureReport + "FAILURE DETAILS:\n";
+failureReport = failureReport + "Failed Action: " + failed_response.get("action") + "\n";
+// Get error code if available
+errorCode = 0;
+if(cause.get("code") != null)
+{
+	errorCode = cause.get("code").toNumber();
+	failureReport = failureReport + "Error Code: " + errorCode + "\n";
+}
+// Get error message if available
+if(cause.get("message") != null)
+{
+	failureReport = failureReport + "Error Message: " + cause.get("message") + "\n";
+}
+failureReport = failureReport + "\nFull Failed Response: " + failed_response.toString();
+failureReport = failureReport + "\nFull Cause: " + cause.toString();
+// Send failure alert to admin
+sendmail
+[
+	from :zoho.adminuserid
+	to :"admin@medidesk.com"
+	subject :"Medi Desk Bot Failure - Code " + errorCode
+	message :failureReport
+]
+// Get the failed action type
+failedAction = failed_response.get("action");
+// ========== HANDLE FORWARD FAILURES (Agent Transfer Issues) ==========
+if(failedAction != null && failedAction.equalsIgnoreCase("forward"))
+{
+	// 1001 - OUTSIDE BUSINESS HOURS
+	if(errorCode == 1001)
+	{
+		response.put("action","reply");
+		response.put("replies",{"⏰ We're Currently Outside Working Hours\n\nOUR WORKING HOURS:\n• Monday - Saturday: 9:00 AM - 8:00 PM\n• Sunday: 10:00 AM - 6:00 PM\n\n🚨 FOR MEDICAL EMERGENCIES (24/7):\n📞 Call 112 (National Emergency)\n🏥 Hospital Emergency: +91-98765-43210\n🚑 Ambulance Service: +91-98765-43211\n\nMeanwhile, I can help you with:\n✅ Book appointments for tomorrow\n✅ Schedule lab tests\n✅ View health packages\n✅ Leave a callback message\n\nWhat would you like to do?"});
+		response.put("suggestions",{"Book Appointment","Lab Test Booking","Health Packages","Emergency Contact","Leave Message"});
+	}
+	// 1002 - ALL OPERATORS BUSY
+	else if(errorCode == 1002)
+	{
+		response.put("action","reply");
+		response.put("replies",{"😊 High Volume - All Agents Currently Busy\n\nAll our healthcare advisors are assisting other patients.\n\n⏱️ ESTIMATED WAIT TIME: 5-10 minutes\n\nINSTANT SOLUTIONS (No Waiting!):\n✅ Book Appointment - Get confirmed in 2 minutes\n✅ Schedule Lab Tests - Book home collection now\n✅ View Health Packages - Compare and book\n✅ Request Callback - We'll call within 1 hour\n\n📞 DIRECT CONTACT:\n• Main Line: +91-98765-43210\n• WhatsApp: +91-98765-43210\n• Email: contact@medidesk.com\n\nWhat would you prefer?"});
+		response.put("suggestions",{"Wait for Agent","Book Appointment","Lab Test Booking","Request Callback","Call Us"});
+	}
+	// 1003 - INVALID OR DISABLED OPERATORS
+	else if(errorCode == 1003)
+	{
+		response.put("action","reply");
+		response.put("replies",{"⚠️ Live Chat Temporarily Unavailable\n\nOur live chat support is experiencing technical difficulties.\n\nALTERNATIVE WAYS TO REACH US:\n📞 Phone: +91-98765-43210\n📧 Email: contact@medidesk.com\n💬 WhatsApp: +91-98765-43210\n\nI CAN STILL HELP YOU WITH:\n✅ Book doctor appointments\n✅ Schedule lab tests\n✅ Browse health packages\n✅ Get emergency contacts\n\nHow can I assist you?"});
+		response.put("suggestions",{"Book Appointment","Lab Test Booking","Call Hospital","WhatsApp Us","Email Us"});
+	}
+	// GENERIC FORWARD FAILURE
+	else
+	{
+		response.put("action","reply");
+		response.put("replies",{"❌ Unable to Connect to Support Agent\n\nWe're having trouble connecting you to our support team right now.\n\n📞 IMMEDIATE CONTACT OPTIONS:\n• Phone: +91-98765-43210\n• WhatsApp: +91-98765-43210\n• Email: contact@medidesk.com\n\n🚨 For emergencies: Call 112\n\nMeanwhile, I can help you:\n✅ Book appointments\n✅ Schedule tests\n✅ View packages\n\nWhat would you like to do?"});
+		response.put("suggestions",{"Book Appointment","Lab Tests","Call Us","Emergency","Back to Menu"});
+	}
+}
+// ========== HANDLE CONTEXT FAILURES (Form/Booking Issues) ==========
+else if(failedAction != null && failedAction.equalsIgnoreCase("context"))
+{
+	response.put("action","reply");
+	response.put("replies",{"😔 Oops! Something Went Wrong\n\nWe encountered an issue while processing your request.\n\nPOSSIBLE REASONS:\n• Network connectivity issue\n• Invalid or incomplete information\n• System timeout\n• Temporary server glitch\n\nWHAT YOU CAN DO:\n✅ Try booking again (most issues resolve on retry)\n✅ Check your internet connection\n✅ Contact our support team directly\n✅ Call us for manual booking\n\n📞 QUICK HELP:\n• Phone: +91-98765-43210\n• WhatsApp: +91-98765-43210\n• Email: appointments@medidesk.com\n\nWould you like to try again?"});
+	response.put("suggestions",{"Try Again","Call Support","Talk to Agent","Email Us","Back to Menu"});
+}
+// ========== HANDLE API/INTEGRATION FAILURES ==========
+else if(cause.containsKey("message") && (cause.get("message").contains("API") || cause.get("message").contains("integration") || cause.get("message").contains("connection") || cause.get("message").contains("CRM")))
+{
+	response.put("action","reply");
+	response.put("replies",{"⚠️ System Integration Issue\n\nWe're experiencing a temporary technical issue with our booking system.\n\n📞 BOOK VIA PHONE (Instant!):\n• Call: +91-98765-43210\n• WhatsApp: +91-98765-43210\n\n📧 BOOK VIA EMAIL:\n• Send details to: appointments@medidesk.com\n• We'll confirm within 30 minutes\n\n⏱️ OR TRY AGAIN:\n• Wait 2-3 minutes and retry\n• Clear browser cache and refresh\n\n🚨 FOR EMERGENCIES:\n• Call 112 immediately\n• Hospital Emergency: +91-98765-43210\n\nWe apologize for the inconvenience!"});
+	response.put("suggestions",{"Try Again in 2 Minutes","Call to Book","WhatsApp Booking","Email Booking","Emergency"});
+}
+// ========== HANDLE TIMEOUT FAILURES ==========
+else if(cause.containsKey("timeout") || cause.containsKey("message") && cause.get("message").contains("timeout"))
+{
+	response.put("action","reply");
+	response.put("replies",{"⏱️ Request Timeout\n\nYour request took too long to process.\n\nPOSSIBLE REASONS:\n• Slow internet connection\n• Server overload during peak hours\n• Network interruption\n\nQUICK SOLUTIONS:\n1. Check your internet connection\n2. Refresh the page and try again\n3. Switch to mobile data (if on WiFi)\n4. Try from a different device\n\n📞 OR BOOK DIRECTLY:\n• Phone: +91-98765-43210 (Instant booking!)\n• WhatsApp: +91-98765-43210\n• Email: appointments@medidesk.com\n\n🚨 For emergencies: Call 112\n\nReady to try again?"});
+	response.put("suggestions",{"Try Again","Call Us","WhatsApp Us","Emergency","Back to Menu"});
+}
+// ========== HANDLE EMAIL SENDING FAILURES ==========
+else if(failedAction != null && (failedAction.equalsIgnoreCase("email") || cause.containsKey("message") && cause.get("message").contains("email")))
+{
+	response.put("action","reply");
+	response.put("replies",{"📧 Email Delivery Issue\n\n✅ GOOD NEWS: Your booking was successful!\n\n⚠️ However, we couldn't send the confirmation email right now.\n\nDON'T WORRY - WE'VE GOT YOU COVERED:\n✅ SMS confirmation sent to your mobile\n✅ Your booking is saved in our system\n✅ We'll resend the email within 1 hour\n\nPLEASE CHECK:\n• Spam/Junk folder\n• Verify email address is correct\n• Add appointments@medidesk.com to contacts\n\n📞 FOR CONFIRMATION:\n• Call: +91-98765-43210\n• WhatsApp: +91-98765-43210\n\nWe'll verify your booking details immediately!\n\nAnything else I can help with?"});
+	response.put("suggestions",{"Resend Email","Call for Confirmation","WhatsApp Confirmation","Back to Menu"});
+}
+// ========== HANDLE DATABASE/STORAGE FAILURES ==========
+else if(cause.containsKey("message") && (cause.get("message").contains("database") || cause.get("message").contains("storage") || cause.get("message").contains("record") || cause.get("message").contains("save")))
+{
+	response.put("action","reply");
+	response.put("replies",{"⚠️ Data Storage Issue\n\nWe couldn't save your information due to a temporary technical issue.\n\n📞 BOOK MANUALLY (Guaranteed!):\n\nCall us with your details:\n• Phone: +91-98765-43210\n• WhatsApp: +91-98765-43210\n\nOur team will book your appointment manually and confirm immediately.\n\n📧 OR EMAIL YOUR DETAILS:\n• To: appointments@medidesk.com\n• Include: Name, Phone, Preferred Date/Time, Specialty\n• Confirmation within 30 minutes\n\n⏱️ OR TRY AGAIN:\n• Wait 5 minutes and retry booking\n\nWe apologize for the inconvenience!"});
+	response.put("suggestions",{"Try Again","Call to Book","WhatsApp Booking","Email Details","Back to Menu"});
+}
+// ========== HANDLE REPLY FAILURES ==========
+else if(failedAction != null && failedAction.equalsIgnoreCase("reply"))
+{
+	response.put("action","reply");
+	response.put("replies",{"❌ Message Delivery Failed\n\nWe're experiencing a technical issue.\n\n💙 I apologize for the inconvenience!\n\n📞 REACH US DIRECTLY:\n• Phone: +91-98765-43210\n• WhatsApp: +91-98765-43210\n• Email: contact@medidesk.com\n\n🚨 Emergency: Call 112\n\nHow can I help you?"});
+	response.put("suggestions",{"Try Again","Book Appointment","Call Us","Emergency","Back to Menu"});
+}
+// ========== HANDLE PAYMENT/TRANSACTION FAILURES ==========
+else if(cause.containsKey("message") && (cause.get("message").contains("payment") || cause.get("message").contains("transaction") || cause.get("message").contains("billing")))
+{
+	response.put("action","reply");
+	response.put("replies",{"💳 Payment Processing Issue\n\n⚠️ We encountered an issue processing your payment.\n\n✅ IMPORTANT: Your appointment is still CONFIRMED!\n\nPAYMENT OPTIONS:\n1. Pay at Hospital Reception\n   • Cash, Card, UPI accepted\n   • Before/after consultation\n\n2. Try Online Payment Again\n   • Different payment method\n   • Check card/bank details\n\n3. Contact Billing Department\n   • Phone: +91-98765-43210 (Ext: 101)\n   • Email: billing@medidesk.com\n\n🔒 Your payment details are secure.\n💙 Your appointment stands confirmed!\n\nWhat would you like to do?"});
+	response.put("suggestions",{"Retry Payment","Pay at Hospital","Contact Billing","View Appointment","Back to Menu"});
+}
+// ========== GENERIC FAILURE (Catch-All) ==========
+else
+{
+	response.put("action","reply");
+	response.put("replies",{"❌ Unexpected Error Occurred\n\nWe encountered an unexpected technical issue.\n\n📞 IMMEDIATE ASSISTANCE:\n• Phone: +91-98765-43210\n• WhatsApp: +91-98765-43210\n• Email: contact@medidesk.com\n\n⏰ Available: Mon-Sat, 9 AM - 8 PM\n\nYOU CAN:\n✅ Try your action again\n✅ Return to main menu\n✅ Contact support directly\n✅ Book via phone (instant!)\n\n🚨 FOR MEDICAL EMERGENCIES:\nCall 112 immediately!\n\nWe sincerely apologize for the inconvenience.\n\nYour health matters to us! 💙"});
+	response.put("suggestions",{"Try Again","Call Hospital","WhatsApp Us","Emergency: Call 112","Back to Menu"});
+}
+return response;
