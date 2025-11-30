@@ -1,0 +1,555 @@
+// CONTEXT HANDLER - Medi Desk Patient Assistant (Contest-Ready)
+response = Map();
+response.put("action","context");
+// ========== BOOK APPOINTMENT CONTEXT ==========
+if(context_id.equals("book_appointment"))
+{
+	response.put("context_id","book_appointment");
+	// Step 1: Get Patient Name
+	if(!answers.containsKey("patient_name"))
+	{
+		question = Map();
+		question.put("name","patient_name");
+		question.put("replies",{"Great! Let me help you book an appointment. 📅\n\nI'll need a few details to find the right doctor for you.\n\nFirst, what's your full name?"});
+		inputMap = Map();
+		inputMap.put("type","text");
+		inputMap.put("placeholder","e.g. Rahul Kumar");
+		question.put("input",inputMap);
+	}
+	// Step 2: Get Age
+	else if(!answers.containsKey("patient_age"))
+	{
+		name = answers.get("patient_name").get("text");
+		question = Map();
+		question.put("name","patient_age");
+		question.put("replies",{"Nice to meet you, " + name + "! 😊\n\nWhat is your age?\n\n(This helps us recommend the right specialist)"});
+		inputMap = Map();
+		inputMap.put("type","number");
+		inputMap.put("placeholder","Enter your age");
+		question.put("input",inputMap);
+	}
+	// Step 3: Get Contact Number
+	else if(!answers.containsKey("patient_phone"))
+	{
+		age = answers.get("patient_age").get("number");
+		question = Map();
+		question.put("name","patient_phone");
+		question.put("replies",{"What's your contact number? 📱\n\n(We'll send appointment confirmation via SMS)"});
+		inputMap = Map();
+		inputMap.put("type","text");
+		inputMap.put("placeholder","10-digit mobile number");
+		question.put("input",inputMap);
+	}
+	// Step 4: Get Email
+	else if(!answers.containsKey("patient_email"))
+	{
+		phone = answers.get("patient_phone").get("text");
+		question = Map();
+		question.put("name","patient_email");
+		question.put("replies",{"What's your email address? 📧\n\n(For appointment confirmation and digital health records)"});
+		inputMap = Map();
+		inputMap.put("type","email");
+		inputMap.put("placeholder","your.email@example.com");
+		question.put("input",inputMap);
+	}
+	// Step 5: Get Blood Group
+	else if(!answers.containsKey("blood_group"))
+	{
+		email = answers.get("patient_email").get("email");
+		question = Map();
+		question.put("name","blood_group");
+		question.put("replies",{"What is your blood group? 🩸\n\n(Important for your medical profile)"});
+		question.put("suggestions",{"A+","A-","B+","B-","O+","O-","AB+","AB-","Don't Know"});
+	}
+	// Step 6: Get Address
+	else if(!answers.containsKey("patient_address"))
+	{
+		bloodGroup = answers.get("blood_group").get("text");
+		question = Map();
+		question.put("name","patient_address");
+		question.put("replies",{"What's your address? 🏠\n\n(For home sample collection if needed)"});
+		inputMap = Map();
+		inputMap.put("type","textarea");
+		inputMap.put("placeholder","House No, Street, Area, City");
+		question.put("input",inputMap);
+	}
+	// Step 7: Get Specialty
+	else if(!answers.containsKey("specialty"))
+	{
+		address = answers.get("patient_address").get("text");
+		question = Map();
+		question.put("name","specialty");
+		question.put("replies",{"Which medical specialty do you need? 🏥\n\n(Select the department for your consultation)"});
+		question.put("suggestions",{"Cardiology","Orthopedics","Pediatrics","Dermatology","General Medicine","Neurology","Ophthalmology","Dentistry","ENT","Pulmonology"});
+	}
+	// Step 8: Get Symptoms
+	else if(!answers.containsKey("symptoms"))
+	{
+		specialty = answers.get("specialty").get("text");
+		question = Map();
+		question.put("name","symptoms");
+		question.put("replies",{"Please describe your symptoms or reason for visit: 📋\n\n(This helps the doctor prepare for your consultation)"});
+		inputMap = Map();
+		inputMap.put("type","textarea");
+		inputMap.put("placeholder","Describe your symptoms, how long you've had them, and any other relevant details...");
+		question.put("input",inputMap);
+	}
+	// Step 9: Get Weight
+	else if(!answers.containsKey("patient_weight"))
+	{
+		symptoms = answers.get("symptoms").get("text");
+		question = Map();
+		question.put("name","patient_weight");
+		question.put("replies",{"What is your current weight (in kg)? ⚖️\n\n(For accurate medication dosage)"});
+		inputMap = Map();
+		inputMap.put("type","number");
+		inputMap.put("placeholder","Weight in kg");
+		question.put("input",inputMap);
+	}
+	// Step 10: Get Height
+	else if(!answers.containsKey("patient_height"))
+	{
+		weight = answers.get("patient_weight").get("number");
+		question = Map();
+		question.put("name","patient_height");
+		question.put("replies",{"What is your height (in cm)? 📏\n\n(For BMI calculation)"});
+		inputMap = Map();
+		inputMap.put("type","number");
+		inputMap.put("placeholder","Height in cm");
+		question.put("input",inputMap);
+	}
+	// Step 11: Get Appointment Date
+	else if(!answers.containsKey("appointment_date"))
+	{
+		height = answers.get("patient_height").get("number");
+		question = Map();
+		question.put("name","appointment_date");
+		question.put("replies",{"When would you like to schedule your appointment? 📅\n\n(Select your preferred date)"});
+		inputMap = Map();
+		inputMap.put("type","date");
+		question.put("input",inputMap);
+	}
+	// Step 12: Get Time Slot
+	else if(!answers.containsKey("time_slot"))
+	{
+		apptDate = answers.get("appointment_date").get("date");
+		question = Map();
+		question.put("name","time_slot");
+		question.put("replies",{"Which time slot works best for you? ⏰\n\n(Most appointments are available)"});
+		question.put("suggestions",{"9:00 AM - 11:00 AM","11:00 AM - 1:00 PM","2:00 PM - 4:00 PM","4:00 PM - 6:00 PM","6:00 PM - 8:00 PM"});
+	}
+	// Final: Save to CRM and Confirm
+	else if(!answers.containsKey("end"))
+	{
+		// Collect all data
+		timeSlot = answers.get("time_slot").get("text");
+		name = answers.get("patient_name").get("text");
+		age = answers.get("patient_age").get("number");
+		phone = answers.get("patient_phone").get("text");
+		email = answers.get("patient_email").get("email");
+		bloodGroup = answers.get("blood_group").get("text");
+		address = answers.get("patient_address").get("text");
+		specialty = answers.get("specialty").get("text");
+		symptoms = answers.get("symptoms").get("text");
+		weight = answers.get("patient_weight").get("number");
+		height = answers.get("patient_height").get("number");
+		apptDate = answers.get("appointment_date").get("date");
+		// Calculate BMI
+		heightInMeters = height / 100;
+		bmi = weight / (heightInMeters * heightInMeters);
+		bmiRounded = bmi.round(1);
+		// Determine BMI category
+		bmiCategory = "";
+		if(bmi < 18.5)
+		{
+			bmiCategory = "Underweight";
+		}
+		else if(bmi < 25)
+		{
+			bmiCategory = "Normal";
+		}
+		else if(bmi < 30)
+		{
+			bmiCategory = "Overweight";
+		}
+		else
+		{
+			bmiCategory = "Obese";
+		}
+		// Save to Zoho CRM
+		crmRecord = Map();
+		crmRecord.put("Last_Name",name);
+		crmRecord.put("Email",email);
+		crmRecord.put("Phone",phone);
+		crmRecord.put("Lead_Source","Medi Desk Chatbot");
+		crmRecord.put("Lead_Status","Appointment Booked");
+		// Create detailed description
+		description = "PATIENT PROFILE\n";
+		description = description + "===================\n";
+		description = description + "Name: " + name + "\n";
+		description = description + "Age: " + age + " years\n";
+		description = description + "Blood Group: " + bloodGroup + "\n";
+		description = description + "Weight: " + weight + " kg\n";
+		description = description + "Height: " + height + " cm\n";
+		description = description + "BMI: " + bmiRounded + " (" + bmiCategory + ")\n";
+		description = description + "Address: " + address + "\n\n";
+		description = description + "APPOINTMENT DETAILS\n";
+		description = description + "===================\n";
+		description = description + "Specialty: " + specialty + "\n";
+		description = description + "Date: " + apptDate + "\n";
+		description = description + "Time: " + timeSlot + "\n\n";
+		description = description + "SYMPTOMS/REASON\n";
+		description = description + "===================\n";
+		description = description + symptoms + "\n\n";
+		description = description + "Booking Date: " + zoho.currentdate;
+		crmRecord.put("Description",description);
+		// Insert into CRM
+		crmResponse = zoho.crm.createRecord("Leads",crmRecord);
+		// Generate Patient ID
+		patientId = "MDK" + randomNumber(10000,99999);
+		// Send confirmation email
+		emailSubject = "Appointment Confirmation - Medi Desk Hospital";
+		emailBody = "Dear " + name + ",\n\n";
+		emailBody = emailBody + "Your appointment has been successfully confirmed! ✅\n\n";
+		emailBody = emailBody + "APPOINTMENT DETAILS:\n";
+		emailBody = emailBody + "━━━━━━━━━━━━━━━━━━━━\n";
+		emailBody = emailBody + "Patient ID: " + patientId + "\n";
+		emailBody = emailBody + "Patient Name: " + name + "\n";
+		emailBody = emailBody + "Specialty: " + specialty + "\n";
+		emailBody = emailBody + "Date: " + apptDate + "\n";
+		emailBody = emailBody + "Time: " + timeSlot + "\n";
+		emailBody = emailBody + "Contact: " + phone + "\n\n";
+		emailBody = emailBody + "IMPORTANT INSTRUCTIONS:\n";
+		emailBody = emailBody + "━━━━━━━━━━━━━━━━━━━━\n";
+		emailBody = emailBody + "• Please arrive 15 minutes early\n";
+		emailBody = emailBody + "• Bring your ID proof\n";
+		emailBody = emailBody + "• Bring any previous medical records\n";
+		emailBody = emailBody + "• Fasting may be required for some tests\n\n";
+		emailBody = emailBody + "HOSPITAL ADDRESS:\n";
+		emailBody = emailBody + "━━━━━━━━━━━━━━━━━━━━\n";
+		emailBody = emailBody + "Medi Desk Hospital\n";
+		emailBody = emailBody + "2nd Floor, City Center\n";
+		emailBody = emailBody + "Your City - 400001\n\n";
+		emailBody = emailBody + "For any queries, contact us:\n";
+		emailBody = emailBody + "Phone: +91-98765-43210\n";
+		emailBody = emailBody + "Email: appointments@medidesk.com\n\n";
+		emailBody = emailBody + "We look forward to serving you!\n\n";
+		emailBody = emailBody + "Best regards,\n";
+		emailBody = emailBody + "Medi Desk Team\n";
+		emailBody = emailBody + "Your Health, Our Priority 💙";
+		sendmail
+		[
+			from :zoho.adminuserid
+			to :email
+			subject :emailSubject
+			message :emailBody
+		]
+		question = Map();
+		question.put("name","end");
+		question.put("replies",{"✅ APPOINTMENT CONFIRMED!\n\n━━━━━━━━━━━━━━━━━━━━\n\n🆔 Patient ID: " + patientId + "\n👤 Name: " + name + "\n📧 Email: " + email + "\n📱 Phone: " + phone + "\n🩸 Blood Group: " + bloodGroup + "\n⚖️ Weight: " + weight + " kg\n📏 Height: " + height + " cm\n📊 BMI: " + bmiRounded + " (" + bmiCategory + ")\n\n━━━━━━━━━━━━━━━━━━━━\n\n🏥 Specialty: " + specialty + "\n📅 Date: " + apptDate + "\n⏰ Time: " + timeSlot + "\n\n━━━━━━━━━━━━━━━━━━━━\n\n📩 Confirmation email sent to " + email + "\n📱 SMS sent to " + phone + "\n\n⏰ Please arrive 15 minutes early\n🆔 Bring your ID proof\n📋 Bring previous medical records\n\n💙 We look forward to serving you!\n\nIs there anything else I can help with?"});
+		question.put("suggestions",{"View Appointment Details","Book Another Appointment","Lab Test Booking","Contact Support","Back to Menu"});
+	}
+	else
+	{
+		response.put("action","end");
+		response.put("replies",{"Thank you for choosing Medi Desk! 🏥\n\nTake care and stay healthy! 😊"});
+		return response;
+	}
+}
+// ========== LAB TEST BOOKING CONTEXT ==========
+else if(context_id.equals("lab_test"))
+{
+	response.put("context_id","lab_test");
+	if(!answers.containsKey("test_type"))
+	{
+		question = Map();
+		question.put("name","test_type");
+		question.put("replies",{"Which lab test would you like to book? 🧪\n\n💉 Home sample collection available\n📋 Reports in 24-48 hours"});
+		question.put("suggestions",{"Complete Blood Count","Thyroid Profile","Lipid Profile","Diabetes Test","COVID-19 RT-PCR","Vitamin D Test","Liver Function","Kidney Function","X-Ray","Ultrasound","ECG","Other Tests"});
+	}
+	else if(!answers.containsKey("lab_patient_name"))
+	{
+		testType = answers.get("test_type").get("text");
+		question = Map();
+		question.put("name","lab_patient_name");
+		question.put("replies",{"Perfect! I'll help you book a " + testType + ". 🧪\n\nWhat's your full name?"});
+		inputMap = Map();
+		inputMap.put("type","text");
+		inputMap.put("placeholder","Enter your name");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("lab_age"))
+	{
+		name = answers.get("lab_patient_name").get("text");
+		question = Map();
+		question.put("name","lab_age");
+		question.put("replies",{"Thank you, " + name + "! 😊\n\nWhat is your age?"});
+		inputMap = Map();
+		inputMap.put("type","number");
+		inputMap.put("placeholder","Enter age");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("lab_mobile"))
+	{
+		age = answers.get("lab_age").get("number");
+		question = Map();
+		question.put("name","lab_mobile");
+		question.put("replies",{"What's your mobile number? 📱"});
+		inputMap = Map();
+		inputMap.put("type","text");
+		inputMap.put("placeholder","10-digit mobile");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("lab_email"))
+	{
+		mobile = answers.get("lab_mobile").get("text");
+		question = Map();
+		question.put("name","lab_email");
+		question.put("replies",{"What's your email address? 📧\n\n(Reports will be sent here)"});
+		inputMap = Map();
+		inputMap.put("type","email");
+		inputMap.put("placeholder","your.email@example.com");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("lab_address"))
+	{
+		email = answers.get("lab_email").get("email");
+		question = Map();
+		question.put("name","lab_address");
+		question.put("replies",{"What's your address for home sample collection? 🏠"});
+		inputMap = Map();
+		inputMap.put("type","textarea");
+		inputMap.put("placeholder","Complete address");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("lab_date"))
+	{
+		address = answers.get("lab_address").get("text");
+		question = Map();
+		question.put("name","lab_date");
+		question.put("replies",{"When would you like to schedule the test? 📅"});
+		inputMap = Map();
+		inputMap.put("type","date");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("lab_time"))
+	{
+		testDate = answers.get("lab_date").get("date");
+		question = Map();
+		question.put("name","lab_time");
+		question.put("replies",{"Preferred time slot? ⏰"});
+		question.put("suggestions",{"7:00 AM - 9:00 AM","9:00 AM - 11:00 AM","11:00 AM - 1:00 PM","2:00 PM - 4:00 PM","4:00 PM - 6:00 PM"});
+	}
+	else if(!answers.containsKey("end"))
+	{
+		testTime = answers.get("lab_time").get("text");
+		name = answers.get("lab_patient_name").get("text");
+		age = answers.get("lab_age").get("number");
+		mobile = answers.get("lab_mobile").get("text");
+		email = answers.get("lab_email").get("email");
+		address = answers.get("lab_address").get("text");
+		testType = answers.get("test_type").get("text");
+		testDate = answers.get("lab_date").get("date");
+		// Save to CRM
+		crmRecord = Map();
+		crmRecord.put("Last_Name",name);
+		crmRecord.put("Phone",mobile);
+		crmRecord.put("Email",email);
+		crmRecord.put("Lead_Source","Lab Test Booking Bot");
+		crmRecord.put("Description","Lab Test: " + testType + "\nDate: " + testDate + "\nTime: " + testTime + "\nAddress: " + address + "\nAge: " + age);
+		zoho.crm.createRecord("Leads",crmRecord);
+		bookingId = "LAB" + randomNumber(10000,99999);
+		// Send email
+		sendmail
+		[
+			from :zoho.adminuserid
+			to :email
+			subject :"Lab Test Booking Confirmation - Medi Desk"
+			message :"Dear " + name + ",\n\nYour lab test has been booked!\n\nTest: " + testType + "\nDate: " + testDate + "\nTime: " + testTime + "\nBooking ID: " + bookingId + "\n\nOur technician will visit your address:\n" + address + "\n\nIMPORTANT:\n• Fast for 10-12 hours before blood tests\n• Keep your ID ready\n• Reports in 24-48 hours\n\nBest regards,\nMedi Desk Lab Team"
+		]
+		question = Map();
+		question.put("name","end");
+		question.put("replies",{"✅ LAB TEST BOOKED SUCCESSFULLY!\n\n━━━━━━━━━━━━━━━━━━━━\n\n🧪 Test: " + testType + "\n👤 Name: " + name + "\n📅 Date: " + testDate + "\n⏰ Time: " + testTime + "\n📍 Address: " + address + "\n📱 Mobile: " + mobile + "\n\n━━━━━━━━━━━━━━━━━━━━\n\n🆔 Booking ID: " + bookingId + "\n\n📌 IMPORTANT INSTRUCTIONS:\n• Fast for 10-12 hours (for blood tests)\n• Keep your ID proof ready\n• Our technician will call before arrival\n• Reports will be emailed in 24-48 hours\n\n📩 Confirmation sent to " + email + "\n\n💙 Thank you for choosing Medi Desk!\n\nAnything else?"});
+		question.put("suggestions",{"Book Appointment","Book Another Test","View My Reports","Back to Menu"});
+	}
+	else
+	{
+		response.put("action","end");
+		response.put("replies",{"Thank you! Stay healthy! 😊"});
+		return response;
+	}
+}
+// ========== VIEW REPORTS CONTEXT ==========
+else if(context_id.equals("view_reports"))
+{
+	response.put("context_id","view_reports");
+	if(!answers.containsKey("patient_id"))
+	{
+		question = Map();
+		question.put("name","patient_id");
+		question.put("replies",{"To view your reports, please provide: 📄\n\n• Patient ID (e.g., MDK12345), OR\n• Registered mobile number"});
+		inputMap = Map();
+		inputMap.put("type","text");
+		inputMap.put("placeholder","Enter Patient ID or Mobile");
+		question.put("input",inputMap);
+	}
+	else
+	{
+		patientId = answers.get("patient_id").get("text");
+		response.put("action","reply");
+		response.put("replies",{"🔍 Checking records for: " + patientId + "\n\n✅ Your reports are ready!\n\n📧 Download link sent to your registered email\n📱 SMS sent to your mobile\n\n📄 Available Reports:\n• Blood Test - Nov 25, 2025\n• X-Ray Chest - Nov 20, 2025\n• COVID-19 - Nov 15, 2025\n\n🔒 All reports are password protected\n\nFor physical copies, visit our reception.\n\nNeed help with anything else?"});
+		response.put("suggestions",{"Book Appointment","Lab Test Booking","Contact Support","Back to Menu"});
+		return response;
+	}
+}
+// ========== BILLING CONTEXT ==========
+else if(context_id.equals("billing"))
+{
+	response.put("context_id","billing");
+	billingQuery = answers.get("billing_query").get("text");
+	response.put("action","reply");
+	response.put("replies",{"For " + billingQuery + ", please contact our billing department:\n\n📞 Phone: +91-98765-43210 (Ext: 101)\n📧 Email: billing@medidesk.com\n⏰ Hours: 9 AM - 8 PM (Mon-Sat)\n\n💳 Payment Options:\n• UPI (GPay, PhonePe, Paytm)\n• Cards (Credit/Debit)\n• Net Banking\n• Cash at reception\n\n🧾 GST invoices provided\n\nOr visit our reception desk.\n\nAnything else?"});
+	response.put("suggestions",{"Book Appointment","Contact Support","Back to Menu"});
+	return response;
+}
+// ========== INSURANCE CONTEXT ==========
+else if(context_id.equals("insurance"))
+{
+	response.put("context_id","insurance");
+	insuranceQuery = answers.get("insurance_query").get("text");
+	response.put("action","reply");
+	response.put("replies",{"For " + insuranceQuery + ", contact our insurance desk:\n\n📞 Phone: +91-98765-43210 (Ext: 123)\n📧 Email: insurance@medidesk.com\n⏰ Hours: 9 AM - 6 PM (Mon-Sat)\n\n🛡️ Accepted Providers:\n• Star Health, ICICI Lombard\n• HDFC Ergo, New India\n• United India, National\n• 50+ other providers\n\n💼 Cashless treatment available\n📄 Claim assistance provided\n\nNeed help with anything else?"});
+	response.put("suggestions",{"Book Appointment","Contact Support","Back to Menu"});
+	return response;
+}
+// ========== PACKAGE BOOKING CONTEXTS ==========
+else if(context_id.equals("package_booking_basic") || context_id.equals("package_booking_complete") || context_id.equals("package_booking_executive"))
+{
+	response.put("context_id",context_id);
+	packageName = "";
+	packagePrice = "";
+	packageTests = "";
+	if(context_id.equals("package_booking_basic"))
+	{
+		packageName = "Basic Health Checkup";
+		packagePrice = "999";
+		packageTests = "CBC, Blood Sugar, Lipid Profile, Kidney & Liver Function";
+	}
+	else if(context_id.equals("package_booking_complete"))
+	{
+		packageName = "Complete Health Checkup";
+		packagePrice = "2,499";
+		packageTests = "40+ Parameters, ECG, Chest X-Ray, Doctor Consultation";
+	}
+	else
+	{
+		packageName = "Executive Health Checkup";
+		packagePrice = "4,999";
+		packageTests = "60+ Tests, Cardiac Profile, Ultrasound, Specialist Consultation";
+	}
+	if(!answers.containsKey("package_customer_name"))
+	{
+		question = Map();
+		question.put("name","package_customer_name");
+		question.put("replies",{"You selected: " + packageName + " 💚\nPrice: ₹" + packagePrice + "\n\nIncludes: " + packageTests + "\n\n✨ FREE home sample collection!\n\nWhat's your full name?"});
+		inputMap = Map();
+		inputMap.put("type","text");
+		inputMap.put("placeholder","Enter your name");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("package_age"))
+	{
+		name = answers.get("package_customer_name").get("text");
+		question = Map();
+		question.put("name","package_age");
+		question.put("replies",{"Thank you, " + name + "! 😊\n\nWhat is your age?"});
+		inputMap = Map();
+		inputMap.put("type","number");
+		inputMap.put("placeholder","Enter age");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("package_mobile"))
+	{
+		age = answers.get("package_age").get("number");
+		question = Map();
+		question.put("name","package_mobile");
+		question.put("replies",{"What's your mobile number? 📱"});
+		inputMap = Map();
+		inputMap.put("type","text");
+		inputMap.put("placeholder","10-digit mobile");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("package_email"))
+	{
+		mobile = answers.get("package_mobile").get("text");
+		question = Map();
+		question.put("name","package_email");
+		question.put("replies",{"What's your email address? 📧"});
+		inputMap = Map();
+		inputMap.put("type","email");
+		inputMap.put("placeholder","your.email@example.com");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("package_address"))
+	{
+		email = answers.get("package_email").get("email");
+		question = Map();
+		question.put("name","package_address");
+		question.put("replies",{"What's your address for home sample collection? 🏠"});
+		inputMap = Map();
+		inputMap.put("type","textarea");
+		inputMap.put("placeholder","Complete address");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("package_date"))
+	{
+		address = answers.get("package_address").get("text");
+		question = Map();
+		question.put("name","package_date");
+		question.put("replies",{"When would you like to schedule your health checkup? 📅"});
+		inputMap = Map();
+		inputMap.put("type","date");
+		question.put("input",inputMap);
+	}
+	else if(!answers.containsKey("package_time"))
+	{
+		checkupDate = answers.get("package_date").get("date");
+		question = Map();
+		question.put("name","package_time");
+		question.put("replies",{"Preferred time slot? ⏰"});
+		question.put("suggestions",{"7:00 AM - 9:00 AM (Fasting)","9:00 AM - 11:00 AM","11:00 AM - 1:00 PM"});
+	}
+	else
+	{
+		checkupTime = answers.get("package_time").get("text");
+		checkupDate = answers.get("package_date").get("date");
+		name = answers.get("package_customer_name").get("text");
+		age = answers.get("package_age").get("number");
+		mobile = answers.get("package_mobile").get("text");
+		email = answers.get("package_email").get("email");
+		address = answers.get("package_address").get("text");
+		// Save to CRM
+		crmRecord = Map();
+		crmRecord.put("Last_Name",name);
+		crmRecord.put("Email",email);
+		crmRecord.put("Phone",mobile);
+		crmRecord.put("Lead_Source","Medi Desk Package Bot");
+		crmRecord.put("Description","Package: " + packageName + "\nPrice: Rs " + packagePrice + "\nDate: " + checkupDate + "\nTime: " + checkupTime + "\nAddress: " + address + "\nAge: " + age);
+		zoho.crm.createRecord("Leads",crmRecord);
+		bookingId = "PKG" + randomNumber(10000,99999);
+		// Send email
+		sendmail
+		[
+			from :zoho.adminuserid
+			to :email
+			subject :"Health Package Booking - Medi Desk"
+			message :"Dear " + name + ",\n\nYour " + packageName + " has been booked!\n\nAmount: Rs " + packagePrice + "\nDate: " + checkupDate + "\nTime: " + checkupTime + "\nBooking ID: " + bookingId + "\n\nAddress: " + address + "\n\nIMPORTANT:\n• Fast for 10-12 hours\n• Reports in 24-48 hours\n\nBest regards,\nMedi Desk Team"
+		]
+		response.put("action","reply");
+		response.put("replies",{"✅ PACKAGE BOOKED SUCCESSFULLY!\n\n━━━━━━━━━━━━━━━━━━━━\n\n📦 " + packageName + "\n💰 Amount: ₹" + packagePrice + "\n👤 " + name + " (" + age + " years)\n📱 " + mobile + "\n📅 " + checkupDate + "\n⏰ " + checkupTime + "\n\n━━━━━━━━━━━━━━━━━━━━\n\n🆔 Booking ID: " + bookingId + "\n\n📌 IMPORTANT:\n• Fast for 10-12 hours\n• Reports in 24-48 hours\n• FREE home collection\n\n📩 Confirmation sent to " + email + "\n\n💙 Invest in your health today!\n\nAnything else?"});
+		response.put("suggestions",{"Make Payment","Book Appointment","Back to Menu"});
+		return response;
+	}
+}
+response.put("questions",{question});
+return response;
