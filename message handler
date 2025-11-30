@@ -1,0 +1,186 @@
+// MESSAGE HANDLER - Medi Desk Patient Assistant
+response = Map();
+msg = message.get("text");
+// ========== INITIAL GREETING & MAIN MENU ==========
+if(operation.equals("chat"))
+{
+	if(!msg.equalsIgnoreCase("Book Appointment") && !msg.equalsIgnoreCase("Specialties") && !msg.equalsIgnoreCase("Our Doctors") && !msg.equalsIgnoreCase("Lab Test Booking") && !msg.equalsIgnoreCase("View Reports") && !msg.equalsIgnoreCase("Health Checkup Packages") && !msg.equalsIgnoreCase("Billing & Payments") && !msg.equalsIgnoreCase("Insurance Queries") && !msg.equalsIgnoreCase("Emergency") && !msg.equalsIgnoreCase("About Us") && !msg.equalsIgnoreCase("Contact Us") && !msg.equalsIgnoreCase("Help") && !msg.equalsIgnoreCase("Back to Menu") && !msg.equalsIgnoreCase("Book Basic Package") && !msg.equalsIgnoreCase("Book Complete Package") && !msg.equalsIgnoreCase("Book Executive Package"))
+	{
+		response.put("action","reply");
+		response.put("replies",{"Welcome to Medi Desk!\n\nYour 24/7 Healthcare Companion\n\nI can help you with:\n- Book doctor appointments\n- Schedule lab tests\n- Health checkup packages\n- Emergency assistance\n- View medical reports\n\nHow can I assist you today?"});
+		response.put("suggestions",{"Book Appointment","Lab Test Booking","Health Checkup Packages","Emergency","Help"});
+		return response;
+	}
+}
+// ========== 1. BOOK APPOINTMENT ==========
+if(msg.equalsIgnoreCase("Book Appointment"))
+{
+	response.put("action","context");
+	response.put("context_id","book_appointment");
+	question = Map();
+	question.put("name","patient_name");
+	question.put("replies",{"Great! Let me help you book an appointment.\n\nWhat's your full name?"});
+	inputMap = Map();
+	inputMap.put("type","text");
+	inputMap.put("placeholder","e.g. Rahul Kumar");
+	question.put("input",inputMap);
+	response.put("questions",{question});
+}
+// ========== 2. SPECIALTIES ==========
+else if(msg.equalsIgnoreCase("Specialties"))
+{
+	response.put("action","reply");
+	response.put("replies",{"We offer the following medical specialties:\n\nCardiology - Heart & Cardiovascular\nOrthopedics - Bones & Joints\nPediatrics - Child Healthcare\nDermatology - Skin & Hair\nGeneral Medicine - General Health\nNeurology - Brain & Nervous System\nOphthalmology - Eye Care\nDentistry - Dental Care\n\nWhich specialty would you like?"});
+	response.put("suggestions",{"Book Appointment","Our Doctors","Back to Menu"});
+}
+// ========== 3. OUR DOCTORS ==========
+else if(msg.equalsIgnoreCase("Our Doctors"))
+{
+	response.put("action","reply");
+	response.put("replies",{"Meet our expert medical team:\n\nDr. Rajesh Kumar\nCardiologist | 15+ years\nMBBS, MD (Cardiology)\n\nDr. Priya Sharma\nPediatrician | 10+ years\nMBBS, MD (Pediatrics)\n\nDr. Amit Patel\nOrthopedic Surgeon | 12+ years\nMBBS, MS (Orthopedics)\n\nDr. Sneha Reddy\nDermatologist | 8+ years\nMBBS, MD (Dermatology)\n\nWould you like to book an appointment?"});
+	response.put("suggestions",{"Book Appointment","Specialties","Back to Menu"});
+}
+// ========== 4. LAB TEST BOOKING ==========
+else if(msg.equalsIgnoreCase("Lab Test Booking"))
+{
+	response.put("action","context");
+	response.put("context_id","lab_test");
+	question = Map();
+	question.put("name","test_type");
+	question.put("replies",{"Which lab test would you like to book?\n\nHome sample collection available\nReports in 24-48 hours"});
+	question.put("suggestions",{"Blood Test","X-Ray","MRI Scan","CT Scan","COVID-19 Test","Urine Test","ECG","Ultrasound"});
+	response.put("questions",{question});
+}
+// ========== 5. VIEW REPORTS ==========
+else if(msg.equalsIgnoreCase("View Reports"))
+{
+	response.put("action","context");
+	response.put("context_id","view_reports");
+	question = Map();
+	question.put("name","patient_id");
+	question.put("replies",{"To view your reports, please provide:\n\nPatient ID (e.g. MDK12345)\nOR\nRegistered mobile number"});
+	inputMap = Map();
+	inputMap.put("type","text");
+	inputMap.put("placeholder","Enter Patient ID or Mobile");
+	question.put("input",inputMap);
+	response.put("questions",{question});
+}
+// ========== 6. HEALTH CHECKUP PACKAGES ==========
+else if(msg.equalsIgnoreCase("Health Checkup Packages"))
+{
+	response.put("action","reply");
+	response.put("replies",{"Our Health Checkup Packages:\n\nBASIC HEALTH CHECKUP - Rs 999\n- Complete Blood Count\n- Blood Sugar Tests\n- Lipid Profile\n- Kidney & Liver Function\n\nCOMPLETE HEALTH CHECKUP - Rs 2,499\n- 40+ Parameters\n- ECG & Chest X-Ray\n- Doctor Consultation\n\nEXECUTIVE HEALTH CHECKUP - Rs 4,999\n- 60+ Tests\n- Cardiac Profile\n- Ultrasound Abdomen\n- Specialist Consultation\n\nFREE home sample collection!\n\nWhich package interests you?"});
+	response.put("suggestions",{"Book Basic Package","Book Complete Package","Book Executive Package","Back to Menu"});
+}
+// ========== 7. BILLING & PAYMENTS ==========
+else if(msg.equalsIgnoreCase("Billing & Payments"))
+{
+	response.put("action","context");
+	response.put("context_id","billing");
+	question = Map();
+	question.put("name","billing_query");
+	question.put("replies",{"How can I assist you with billing?"});
+	question.put("suggestions",{"View My Bill","Make Payment","Payment History","Download Invoice"});
+	response.put("questions",{question});
+}
+// ========== 8. INSURANCE QUERIES ==========
+else if(msg.equalsIgnoreCase("Insurance Queries"))
+{
+	response.put("action","context");
+	response.put("context_id","insurance");
+	question = Map();
+	question.put("name","insurance_query");
+	question.put("replies",{"What would you like to know about insurance?"});
+	question.put("suggestions",{"Check Coverage","Claim Status","Accepted Providers","Submit Documents"});
+	response.put("questions",{question});
+}
+// ========== 9. EMERGENCY ==========
+else if(msg.equalsIgnoreCase("Emergency"))
+{
+	response.put("action","reply");
+	response.put("replies",{"EMERGENCY MEDICAL SERVICES\n\nEMERGENCY HELPLINE\nCall: 112 (National Emergency)\nHospital Emergency: +91-98765-43210\n\nAMBULANCE SERVICE\nAvailable 24/7\nCall: +91-98765-43211\n\nEMERGENCY DEPARTMENT\nMedi Desk Hospital\n2nd Floor, City Center\n\nFOR LIFE-THREATENING EMERGENCIES:\n- Severe chest pain\n- Difficulty breathing\n- Heavy bleeding\n- Loss of consciousness\n\nCALL 112 IMMEDIATELY"});
+	response.put("suggestions",{"Call Emergency Now","Get Directions","Book Urgent Appointment","Back to Menu"});
+}
+// ========== 10. ABOUT US ==========
+else if(msg.equalsIgnoreCase("About Us"))
+{
+	response.put("action","reply");
+	response.put("replies",{"About Medi Desk Hospital\n\nEstablished: 2010\n\nOUR MISSION\nProviding world-class healthcare with compassion.\n\nOUR TEAM\n- 50+ Expert Doctors\n- 200+ Medical Staff\n- 24/7 Emergency Services\n\nACCREDITATIONS\n- NABH Certified\n- NABL Lab Certified\n- ISO 9001:2015\n\nACHIEVEMENTS\n- 1 Lakh+ patients treated\n- 4.8 star patient rating"});
+	response.put("suggestions",{"Book Appointment","Our Doctors","Contact Us","Back to Menu"});
+}
+// ========== 11. CONTACT US ==========
+else if(msg.equalsIgnoreCase("Contact Us"))
+{
+	response.put("action","reply");
+	response.put("replies",{"Contact Medi Desk\n\nPhone: +91-98765-43210\nEmail: contact@medidesk.com\nWebsite: www.medidesk.com\n\nAddress:\nMedi Desk Hospital\n2nd Floor, City Center\nYour City - 400001\n\nHours:\nMon-Sat: 9 AM - 8 PM\nSunday: 10 AM - 6 PM\nEmergency: 24/7"});
+	response.put("suggestions",{"Call Us","Email Us","Get Directions","Back to Menu"});
+}
+// ========== 12. HELP ==========
+else if(msg.equalsIgnoreCase("Help"))
+{
+	response.put("action","reply");
+	response.put("replies",{"How can I help you?\n\nFREQUENTLY ASKED:\n\nHow do I book an appointment?\nClick Book Appointment\n\nCan I cancel or reschedule?\nYes! Contact us 24 hours before\n\nDo you accept insurance?\nYes, 50+ providers accepted\n\nAre reports available online?\nYes, via email and patient portal\n\nStill have questions?"});
+	response.put("suggestions",{"Book Appointment","Talk to Agent","Call Us","Back to Menu"});
+}
+// ========== PACKAGE BOOKING SHORTCUTS ==========
+else if(msg.equalsIgnoreCase("Book Basic Package"))
+{
+	response.put("action","context");
+	response.put("context_id","package_booking_basic");
+	question = Map();
+	question.put("name","package_customer_name");
+	question.put("replies",{"You selected: Basic Health Checkup\nPrice: Rs 999\n\nWhat's your full name?"});
+	inputMap = Map();
+	inputMap.put("type","text");
+	inputMap.put("placeholder","Enter your name");
+	question.put("input",inputMap);
+	response.put("questions",{question});
+}
+else if(msg.equalsIgnoreCase("Book Complete Package"))
+{
+	response.put("action","context");
+	response.put("context_id","package_booking_complete");
+	question = Map();
+	question.put("name","package_customer_name");
+	question.put("replies",{"You selected: Complete Health Checkup\nPrice: Rs 2,499\n\nWhat's your full name?"});
+	inputMap = Map();
+	inputMap.put("type","text");
+	inputMap.put("placeholder","Enter your name");
+	question.put("input",inputMap);
+	response.put("questions",{question});
+}
+else if(msg.equalsIgnoreCase("Book Executive Package"))
+{
+	response.put("action","context");
+	response.put("context_id","package_booking_executive");
+	question = Map();
+	question.put("name","package_customer_name");
+	question.put("replies",{"You selected: Executive Health Checkup\nPrice: Rs 4,999\n\nWhat's your full name?"});
+	inputMap = Map();
+	inputMap.put("type","text");
+	inputMap.put("placeholder","Enter your name");
+	question.put("input",inputMap);
+	response.put("questions",{question});
+}
+// ========== BACK TO MENU ==========
+else if(msg.equalsIgnoreCase("Back to Menu"))
+{
+	response.put("action","reply");
+	response.put("replies",{"Main Menu\n\nWhat would you like to do?"});
+	response.put("suggestions",{"Book Appointment","Lab Test Booking","Health Checkup Packages","Emergency","Contact Us","Help"});
+}
+// ========== GRATITUDE RESPONSES ==========
+else if(msg.toLowerCase().contains("thank"))
+{
+	response.put("action","reply");
+	response.put("replies",{"You're most welcome!\n\nIs there anything else I can help you with?"});
+	response.put("suggestions",{"Book Appointment","Emergency","Contact Us","Back to Menu"});
+}
+// ========== DEFAULT FALLBACK ==========
+else
+{
+	response.put("action","reply");
+	response.put("replies",{"I'm here to help! Please choose from the options below:"});
+	response.put("suggestions",{"Book Appointment","Lab Test Booking","Emergency","Contact Us","Help"});
+}
+return response;
